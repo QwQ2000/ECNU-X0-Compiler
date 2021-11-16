@@ -121,7 +121,7 @@ write_stat: WRITESYM expr SEMICOLON ;
 
 read_stat: READSYM var SEMICOLON ;
 
-comp_stat: LPAREN stat_list RPAREN ;
+comp_stat: LBRACE stat_list RBRACE ;
 
 expr_stat: expr SEMICOLON | SEMICOLON ;
 
@@ -189,36 +189,41 @@ int position(char *s)
 	return i;
 }
 
-int main(void)
+int main(int argc,char **argv)
 {
-	printf("Input x0 file?   ");
-	scanf("%s", fname);		/* 输入文件名 */
+    char* out_file_name = NULL;
+    if (argc == 1) {
+        printf("Usage:x0_compiler input_file [output_file]");
+    }
 
-	if ((fin = fopen(fname, "r")) == NULL)
-	{
+	if ((fin = fopen(argv[1], "r")) == NULL) {
 		printf("Can't open the input file!\n");
 		exit(1);
-	}	
-	if ((foutput = fopen("foutput.txt", "w")) == NULL)
-        {
+	}
+    if (argc < 3)
+        out_file_name = "output.txt"; 
+    else
+        out_file_name = argv[2];	
+	if ((foutput = fopen(out_file_name, "w")) == NULL) {
 		printf("Can't open the output file!\n");
 		exit(1);
 	}
 	
 	redirectInput(fin);		
-	init();
-        yyparse();
-	if(err == 0)
-	{
+	
+    init();
+    yyparse();
+	
+    if (err == 0) {
 		printf("\n===Parsing success!===\n");
 		fprintf(foutput, "\n===Parsing success!===\n");
-	}
-        else
-	{
+	} else {
 		printf("%d errors in x0 program\n", err);
 		fprintf(foutput, "%d errors in x0 program\n", err);
 	}
-        fclose(foutput);
+    
+    fclose(foutput);
 	fclose(fin);
-	return 0;
+	
+    return 0;
 }
