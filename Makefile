@@ -1,7 +1,7 @@
 all: x0_compiler clean
 
 x0_compiler: lex yacc
-	gcc -o x0_compiler lex.yy.c x0.tab.c
+	gcc -o x0_compiler lex.yy.c table.c vm.c x0.tab.c
 
 lex: x0.l
 	flex x0.l

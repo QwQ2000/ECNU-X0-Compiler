@@ -9,5 +9,6 @@ m=(x*x+y*y)/2;
 c=97;
 write m;
 write c;
-write (c+1); 
+write (c+1); /*注释？*/
 }
+/*???*/

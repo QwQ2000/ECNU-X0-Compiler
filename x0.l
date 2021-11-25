@@ -45,6 +45,7 @@ int yywrap(void);
 }
 [0-9]+	{yylval.number=atoi(yytext);
 	 return NUM;}
+(\/\*).*(\*\/) {}
 .	{yyerror("Unknown character!");}
 
 %%

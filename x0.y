@@ -1,44 +1,21 @@
 ////////////////////////////////////////////////////////
 //声明部分
 %{
-#include<stdio.h>
-#include<stdlib.h>
-#include<malloc.h>
-#include<memory.h>
-#include<string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <malloc.h>
+#include <memory.h>
+#include <string.h>
 
-
-#define txmax 100     /* 符号表容量 */
-#define al 10         /* 标识符的最大长度 */
-
-/* 符号表中的类型 */
-enum object {
-    var, 
-    array,
-};
-
-/* 符号表结构 */
-struct tablestruct
-{
-   char name[al];     /* 名字 */
-   enum object type;  /* 类型：var或array */
-   int len; /*数组长度：-1或长度*/
-};
-struct tablestruct table[txmax]; /* 符号表 */
-
-
-int tx;         /* 符号表当前尾指针 */
-char id[al];
+#include "table.h"
 
 FILE* fin;      /* 输入源文件 */
 FILE* foutput;  /* 输出出错示意（如有错） */
-char fname[al];
+char fname[MAX_ID_LEN];
 int err;
 extern int line; 
 
 void init();
-void enter(enum object k,int len);
-int position(char *s);
 %}
 
 ////////////////////////////////////////////////////////
@@ -169,24 +146,6 @@ void init()
 {
 	tx = 0;
     err = 0;
-}
-
-void enter(enum object k,int len)
-{
-	tx = tx + 1;
-	strcpy(table[tx].name, id);
-	table[tx].type = k;
-    table[tx].len = len;
-}
-
-int position(char *s)
-{
-	int i;
-	strcpy(table[0].name, s);
-	i = tx;
-	while(strcmp(table[i].name, s) != 0)
-		i--;
-	return i;
 }
 
 int main(int argc,char **argv)
