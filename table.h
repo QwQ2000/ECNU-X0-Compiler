@@ -8,17 +8,18 @@
 
 /* 符号表中标识符的类型 */
 enum id_type {
-    xchar, xint, xbool, xfloat, proc
+    xint, xchar, xbool, xfloat, proc
 };
 
 /* 符号表结构 */
 struct table_t {
-   char name[MAX_ID_LEN];     /* 名字 */
-   enum id_type type;  /* 类型：id_type中定义的类型，字符、整数、布尔、浮点、过程*/
-   int len[MAX_ARR_DIM]; /*数组长度：全部为-1则为变量，从左到右依次为多维数组各个维度的长度*/
-   int is_const; /* 是否为常量 */
-   char const_val[4]; /* 仅支持非数组常量，故统一用4字节的空间存储常量的值 */
-   int addr, size; 
+    char name[MAX_ID_LEN];     /* 名字 */
+    enum id_type type;  /* 类型：id_type中定义的类型，字符、整数、布尔、浮点、过程*/
+    int len[MAX_ARR_DIM]; /*数组长度：全部为-1则为变量，从左到右依次为多维数组各个维度的长度*/
+    int is_const; /* 是否为常量 */
+    char const_val[4]; /* 仅支持非数组常量，故统一用4字节的空间存储常量的值 */
+    int addr;  /* 存储标识符在运行时分配的地址*/
+    int size; /* 存储过程占用的栈空间大小 */
 };
 
 struct table_t table[MAX_ID_TABLE_LEN]; /* 符号表 */
