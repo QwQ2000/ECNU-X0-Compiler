@@ -5,10 +5,15 @@
 #define I2F(x) (*((float*)&(x)))
 #define F2I(x) (*((int*)&(x)))
 
+char* mne_str[] = {"lod", "lit", "sto", "cal", "ini", 
+    "jmp", "jpc", "wrt", "red", "arti", "artf", "log", 
+    "bit", "cmpi", "cmpf", "cvt", "pop", "mov", "lodr", "stor"};
+
 void vm_init() {
     cur = 0;
     base = 1;
     top = 3; // 0位置不用，1和2位置为主程序的动态链、返回地址
+    os_top = 0;
 
     memset(stack,0,sizeof(stack)); // 主程序的动态链、返回地址均为0
 }
@@ -35,7 +40,7 @@ void vm_load_ins(FILE* inf) {
 void vm_save_ins(FILE* outf) {
     int i;
     for (i = 0;i < code_cnt;++i)
-        fprintf(outf,"%s %d\n",mne_str[vcode[code_cnt].m],vcode[code_cnt].a);  
+        fprintf(outf,"%s %d\n",mne_str[vcode[i].m],vcode[i].a);  
 }
 
 void vm_execute(FILE* inf, FILE* outf) {
@@ -45,6 +50,11 @@ void vm_execute(FILE* inf, FILE* outf) {
             printf("%d ",stack[i]);
         printf("\n");*/
     }
+}
+
+void vm_gen(enum mne m, int a) {
+    vcode[code_cnt].m = m;
+    vcode[code_cnt++].a = a;
 }
 
 void vm_step(FILE* inf, FILE* outf) {
@@ -218,27 +228,31 @@ void vm_step(FILE* inf, FILE* outf) {
             }
             break;
 
-        case cmpi: // 0,1,2,3,4 分别对应 ==,<,<=,>,>=
+        case cmpi: // 0,1,2,3,4,5 分别对应 <,<=,>,>=,==,!=
             --top;
             switch (i.a) {
                 case 0:
-                    stack[top - 1] = (stack[top] == stack[top - 1]);
-                    break;
-                
-                case 1:
                     stack[top - 1] = (stack[top] < stack[top - 1]);
                     break;
                 
-                case 2:
+                case 1:
                     stack[top - 1] = (stack[top] <= stack[top - 1]);
                     break;
                 
-                case 3:
+                case 2:
                     stack[top - 1] = (stack[top] > stack[top - 1]);
                     break;
                 
-                case 4:
+                case 3:
                     stack[top - 1] = (stack[top] >= stack[top - 1]);
+                    break;
+                
+                case 4:
+                    stack[top - 1] = (stack[top] == stack[top - 1]);
+                    break;
+                
+                case 5:
+                    stack[top - 1] = (stack[top] != stack[top - 1]);
             }
             break;
         
@@ -246,24 +260,61 @@ void vm_step(FILE* inf, FILE* outf) {
             --top;
             switch (i.a) {
                 case 0:
-                    stack[top - 1] = (I2F(stack[top]) == I2F(stack[top - 1]));
-                    break;
-                
-                case 1:
                     stack[top - 1] = (I2F(stack[top]) < I2F(stack[top - 1]));
                     break;
                 
-                case 2:
+                case 1:
                     stack[top - 1] = (I2F(stack[top]) <= I2F(stack[top - 1]));
                     break;
                 
-                case 3:
+                case 2:
                     stack[top - 1] = (I2F(stack[top]) > I2F(stack[top - 1]));
                     break;
                 
-                case 4:
+                case 3:
                     stack[top - 1] = (I2F(stack[top]) >= I2F(stack[top - 1]));
+                    break;
+                
+                case 4:
+                    stack[top - 1] = (I2F(stack[top]) == I2F(stack[top - 1]));
+                    break;
+                
+                case 5:
+                    stack[top - 1] = (I2F(stack[top]) != I2F(stack[top - 1]));
             }
+            break;
+        
+        case cvt: // 0为整数转浮点，1为浮点转整数；布尔、整数、字符均以整数形式存储
+            if (i.a == 0) {
+                tmp = (float)stack[top - 1];
+                stack[top - 1] = F2I(tmp);
+            }  else {
+                stack[top - 1] = (int)I2F(stack[top - 1]);
+            }
+            break;
+        
+        case pop: // 0 弹栈， 1 弹偏移量栈
+            if (i.a == 0)
+                --top;
+            else
+                --os_top;
+            break;
+        
+        case mov: // 0 栈->偏移量栈， 1 偏移量栈->栈
+            if (i.a == 0)
+                off_stk[os_top++] = stack[--top];
+            else
+                stack[top++] = off_stk[--os_top];
+            break;
+        
+        case lodr:
+            stack[top] = stack[base + off_stk[os_top - 1]];
+            ++top;
+            break;
+
+        case stor:
+            stack[base + off_stk[os_top - 1]] = stack[--top];
+            break;
     }
 }
 

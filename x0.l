@@ -3,6 +3,7 @@
 #include "string.h"
 #include "malloc.h"
 #include "x0.tab.h"
+#include "sdt_structs.h"
 
 int line=1;
 void yyerror(char *);
@@ -18,8 +19,8 @@ int yywrap(void);
 "["		{return LBRACKET;}
 "]"		{return RBRACKET;}
 ";"		{return SEMICOLON;}
-"int"	{return INTSYM;}
-"char"	{return CHARSYM;}
+"int"	{yylval.id_t=0;return INTSYM;}
+"char"	{yylval.id_t=1;return CHARSYM;}
 "if"	{return IFSYM;}
 "("		{return LPAREN;}
 ")"		{return RPAREN;}
@@ -39,31 +40,52 @@ int yywrap(void);
 "*"		{return TIMES;}
 "/"		{return	SLASH;}
 
+"%"		{return MOD;}
+"bool"	{yylval.id_t=2;return BOOLSYM;}
+"float" {yylval.id_t=3;return FLOATSYM;}
+"const" {return CONSTSYM;}
+
+"true"  {yylval.lit_c = (struct lit_const*)malloc(sizeof(struct lit_const));
+	yylval.lit_c -> t = xbool;
+	yylval.lit_c -> val = 1;
+	return NUM;}
+"false" {yylval.lit_c = (struct lit_const*)malloc(sizeof(struct lit_const));
+	yylval.lit_c -> t = xbool;
+	yylval.lit_c -> val = 0;
+	return NUM;}
+
 [A-Za-z]([A-Za-z]|[0-9])*	{yylval.ident=(char *)malloc(strlen(yytext)+1);
                                  strcpy(yylval.ident,yytext);
                                  return ID;
 }
-[0-9]+	{yylval.number=atoi(yytext);
-	 return NUM;}
+[0-9]+\.[0-9]+ {yylval.lit_c = (struct lit_const*)malloc(sizeof(struct lit_const));
+	yylval.lit_c -> t = xfloat;
+	sscanf(yytext,"%f",(float*)(&(yylval.lit_c -> val)));
+	return NUM;}
+[0-9]+	{yylval.lit_c = (struct lit_const*)malloc(sizeof(struct lit_const));
+	yylval.lit_c -> t = xint;
+	yylval.lit_c -> val = atoi(yytext);
+	return NUM;}
+'[\0-\177]' {yylval.lit_c = (struct lit_const*)malloc(sizeof(struct lit_const));
+	yylval.lit_c -> t = xchar;
+	yylval.lit_c -> val = yytext[1];
+	return NUM;}
 (\/\*).*(\*\/) {}
 .	{yyerror("Unknown character!");}
 
 %%
 
-void redirectInput(FILE *input)
-{
+void redirectInput(FILE *input) {
 	yyin=input;
 }
 
-int yygetchar(void)
-{
+int yygetchar(void) {
 	int ret;
 	ret = getc(yyin);
 	printf("%c",ret);
 	return ret;
 }
 
-int yywrap(void)
-{
+int yywrap(void) {
 	return 1;
 }

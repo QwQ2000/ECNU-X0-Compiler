@@ -1,14 +1,11 @@
 main{
-char c;
-int x;
-int y;
-int m;
-read x;
-read y;
-m=(x*x+y*y)/2;
-c=97;
-write m;
-write c;
-write (c+1); /*注释？*/
+    int a[3][5];
+    a[2][3] = 2;
+    a[1][4] = 5;
+    a[0][1] = a[2][3] * (a[1][4] + 3 * 4);
+    write 3 > 2;
+    write 3 == 2;
+    write 3 < 2;
+    write 3 !=2 ;
 }
 /*???*/
