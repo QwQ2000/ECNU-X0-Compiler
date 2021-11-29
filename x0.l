@@ -11,39 +11,53 @@ int yywrap(void);
 %}
 
 %%
-[ \t]	{;}
-[\n]	{line++;}
-"main"	{return MAINSYM;}
-"{"		{return LBRACE;}
-"}"		{return RBRACE;}
-"["		{return LBRACKET;}
-"]"		{return RBRACKET;}
-";"		{return SEMICOLON;}
-"int"	{yylval.id_t=0;return INTSYM;}
-"char"	{yylval.id_t=1;return CHARSYM;}
-"if"	{return IFSYM;}
-"("		{return LPAREN;}
-")"		{return RPAREN;}
-"else"	{return ELSESYM;}
-"while"	{return WHILESYM;}
-"write"	{return WRITESYM;}
-"read"	{return READSYM;}
-"="		{return BECOMES;}
-"<"		{return LSS;}
-"<="	{return LEQ;}
-">"		{return GTR;}
-">="	{return GEQ;}
-"=="	{return EQ;}
-"!="	{return NEQ;}
-"+"		{return PLUS;}
-"-"		{return MINUS;}
-"*"		{return TIMES;}
-"/"		{return	SLASH;}
+[ \t]		{;}
+[\n]		{line++;}
+"main"		{return MAINSYM;}
+"{"			{return LBRACE;}
+"}"			{return RBRACE;}
+"["			{return LBRACKET;}
+"]"			{return RBRACKET;}
+";"			{return SEMICOLON;}
+"int"		{yylval.id_t=0;return INTSYM;}
+"char"		{yylval.id_t=1;return CHARSYM;}
+"if"		{return IFSYM;}
+"("			{return LPAREN;}
+")"			{return RPAREN;}
+"else"		{return ELSESYM;}
+"while"		{return WHILESYM;}
+"write"		{return WRITESYM;}
+"read"		{return READSYM;}
+"="			{return BECOMES;}
+"<"			{return LSS;}
+"<="		{return LEQ;}
+">"			{return GTR;}
+">="		{return GEQ;}
+"=="		{return EQ;}
+"!="		{return NEQ;}
+"+"			{return PLUS;}
+"-"			{return MINUS;}
+"*"			{return TIMES;}
+"/"			{return	SLASH;}
 
-"%"		{return MOD;}
-"bool"	{yylval.id_t=2;return BOOLSYM;}
-"float" {yylval.id_t=3;return FLOATSYM;}
-"const" {return CONSTSYM;}
+"%"			{return MOD;}
+"and"		{return AND;}
+"or"		{return OR;}
+"not"		{return NOT;}
+"bool"		{yylval.id_t=2;return BOOLSYM;}
+"float" 	{yylval.id_t=3;return FLOATSYM;}
+"const" 	{return CONSTSYM;}
+"do"		{return DOSYM;}
+"repeat"	{return REPEATSYM;}
+"until"		{return UNTILSYM;}
+"&"			{return BAND;}
+"|"			{return BOR;}
+"~"			{return BNOT;}
+"^"			{return BXOR;}
+"<<"		{return SHIFTL;}
+">>"		{return SHIFTR;}
+"odd"		{return ODD;}
+"for"		{return FORSYM;}
 
 "true"  {yylval.lit_c = (struct lit_const*)malloc(sizeof(struct lit_const));
 	yylval.lit_c -> t = xbool;

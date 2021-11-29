@@ -149,11 +149,11 @@ void vm_step(FILE* inf, FILE* outf) {
                     break;
                 
                 case 3:
-                    stack[top - 1] = stack[top] / stack[top - 1];
+                    stack[top - 1] = stack[top - 1] / stack[top];
                     break;
                 
                 case 4:
-                    stack[top - 1] = stack[top] % stack[top - 1];
+                    stack[top - 1] = stack[top - 1] % stack[top];
                     break;
             }
             break;
@@ -174,7 +174,7 @@ void vm_step(FILE* inf, FILE* outf) {
                     break;
                 
                 case 3:
-                    tmp = I2F(stack[top]) / I2F(stack[top - 1]);
+                    tmp = I2F(stack[top - 1]) / I2F(stack[top]);
             }
             stack[top - 1] = F2I(tmp);
             break;
@@ -219,12 +219,12 @@ void vm_step(FILE* inf, FILE* outf) {
                 
                 case 4:
                     --top;
-                    stack[top - 1] = stack[top] << stack[top - 1];
+                    stack[top - 1] = stack[top - 1] << stack[top];
                     break;
                 
                 case 5:
                     --top;
-                    stack[top - 1] = stack[top] >> stack[top - 1];
+                    stack[top - 1] = stack[top - 1] >> stack[top];
             }
             break;
 

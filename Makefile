@@ -10,4 +10,4 @@ yacc: x0.y
 	bison -d x0.y
 
 clean:
-	rm lex.yy.c x0.tab.c x0.tab.h
+	rm lex.yy.c x0.tab.c

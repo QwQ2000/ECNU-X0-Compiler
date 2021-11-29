@@ -37,18 +37,21 @@ struct arr_dim* arr_dim;
 struct var_info* var_inf;
 }
 
-%token MAINSYM, IFSYM, ELSESYM, WHILESYM, READSYM, WRITESYM
-%token LBRACE, RBRACE, LBRACKET, RBRACKET, SEMICOLON, LPAREN, RPAREN
-%token BECOMES, LSS, LEQ, GTR, GEQ, EQ, NEQ, PLUS, MINUS, TIMES, SLASH
-%token MOD, CONSTSYM
+%token MAINSYM, IFSYM, ELSESYM, WHILESYM, READSYM, WRITESYM, CONSTSYM
+%token LBRACE, RBRACE, LBRACKET, RBRACKET, SEMICOLON, LPAREN, RPAREN 
+%token DOSYM, REPEATSYM, UNTILSYM, FORSYM
+
+%left BECOMES, LSS, LEQ, GTR, GEQ, EQ, NEQ, PLUS, MINUS, TIMES, SLASH
+%left MOD, AND, OR, BAND, BOR, BXOR, SHIFTL, SHIFTR
+%right NOT, BNOT, ODD
 
 %token <id_t> INTSYM, CHARSYM, BOOLSYM, FLOATSYM
 %token <ident> ID
 %token <lit_c> NUM
 
 %type <number> ident
-%type <number> var, arr_offset
-%type <id_t> type, expr, simple_expr, add_expr, term, factor
+%type <number> var, arr_offset, code_addr, else_stat
+%type <id_t> type, expr, simple_expr, add_expr, term, factor, logic_expr
 %type <arr_dim> dim_list
 
 %start program
@@ -121,19 +124,78 @@ type: INTSYM {$$ = $1;} | CHARSYM {$$ = $1;} | BOOLSYM {$$ = $1;} | FLOATSYM {$$
 stat_list: stat_list stat | ;
 
 stat: if_stat | while_stat | read_stat 
-| write_stat | comp_stat | expr_stat; 
+| write_stat | comp_stat | expr_stat
+| for_stat; 
 
-if_stat: IFSYM LPAREN expr RPAREN stat 
-| IFSYM LPAREN expr RPAREN stat ELSESYM stat ;
+if_stat: IFSYM LPAREN expr RPAREN code_addr   
+                                    {
+                                        vm_gen(jpc, 0);
+                                    } 
+stat else_stat   
+        {
+            vcode[$5].a = $8;
+        };
 
-while_stat: WHILESYM LPAREN expr RPAREN stat ;
+else_stat: ELSESYM code_addr  
+                    {
+                        vm_gen(jmp, 0);
+                    } 
+stat   
+    {
+        $$ = $2 + 1;
+        vcode[$2].a = code_cnt;
+    }
+| { $$ = code_cnt; };
+
+while_stat: WHILESYM code_addr LPAREN expr RPAREN code_addr 
+                                                    {
+                                                        vm_gen(jpc, 0);
+                                                    }
+stat
+    {
+        vm_gen(jmp, $2);
+        vcode[$6].a = code_cnt;
+    }
+| DOSYM code_addr stat WHILESYM LPAREN expr 
+                                        {
+                                            vm_gen(log, 2);
+                                            vm_gen(jpc, $2);
+                                        }
+RPAREN SEMICOLON
+| REPEATSYM code_addr stat UNTILSYM LPAREN expr 
+                                            {
+                                                vm_gen(jpc, $2);
+                                            }
+RPAREN SEMICOLON;
+
+for_stat: FORSYM LPAREN for_expr SEMICOLON code_addr for_expr SEMICOLON code_addr
+                                                                        {
+                                                                            vm_gen(jpc, 0);
+                                                                            vm_gen(jmp, 0);
+                                                                        }
+for_expr 
+    {
+        vm_gen(jmp, $5);
+    }
+RPAREN code_addr stat
+                    {
+                        vm_gen(jmp, $8 + 2);
+                        vcode[$8].a = code_cnt;
+                        vcode[$8 + 1].a = $13;
+                    };
+
+for_expr: expr | ;
 
 write_stat: WRITESYM expr SEMICOLON 
     {
-        vm_gen(wrt,$2);
+        vm_gen(wrt, $2);
     };
 
-read_stat: READSYM var SEMICOLON ;
+read_stat: READSYM var SEMICOLON 
+    {
+        vm_gen(red, table[$2].type);
+        vm_gen(sto, table[$2].addr);
+    };
 
 comp_stat: LBRACE stat_list RBRACE ;
 
@@ -157,9 +219,29 @@ expr: var BECOMES expr
                 vm_gen(lod,table[$1].addr);
             }
         }
-| simple_expr 
+| logic_expr 
     {
         $$ = $1;
+    };
+
+logic_expr: simple_expr
+                {
+                    $$ = $1;
+                }
+| simple_expr AND simple_expr
+    {
+        $$ = 2;
+        vm_gen(log, 0);
+    }
+| simple_expr OR simple_expr
+    {
+        $$ = 2;
+        vm_gen(log, 1);
+    }
+| NOT simple_expr
+    {
+        $$ = 2;
+        vm_gen(log, 2);
     };
 
 simple_expr: add_expr 
@@ -174,7 +256,7 @@ simple_expr: add_expr
         else if ($1 != 3 && $3 != 3)
             vm_gen(cmpi,0);
         else
-            yyerror("Incompatible types in arithmetic operation!");
+            yyerror("Incompatible types in comparison operation!");
     }
 | add_expr GEQ add_expr
     {
@@ -184,7 +266,7 @@ simple_expr: add_expr
         else if ($1 != 3 && $3 != 3)
             vm_gen(cmpi,1);
         else
-            yyerror("Incompatible types in arithmetic operation!");
+            yyerror("Incompatible types in comparison operation!");
     }
 | add_expr LSS add_expr
     {
@@ -194,7 +276,7 @@ simple_expr: add_expr
         else if ($1 != 3 && $3 != 3)
             vm_gen(cmpi,2);
         else
-            yyerror("Incompatible types in arithmetic operation!");
+            yyerror("Incompatible types in comparison operation!");
     }
 | add_expr LEQ add_expr
     {
@@ -204,7 +286,7 @@ simple_expr: add_expr
         else if ($1 != 3 && $3 != 3)
             vm_gen(cmpi,3);
         else
-            yyerror("Incompatible types in arithmetic operation!");
+            yyerror("Incompatible types in comparison operation!");
     }
 | add_expr EQ add_expr
     {
@@ -214,7 +296,7 @@ simple_expr: add_expr
         else if ($1 != 3 && $3 != 3)
             vm_gen(cmpi,4);
         else
-            yyerror("Incompatible types in arithmetic operation!");
+            yyerror("Incompatible types in comparison operation!");
     }
 | add_expr NEQ add_expr 
     {
@@ -224,7 +306,7 @@ simple_expr: add_expr
         else if ($1 != 3 && $3 != 3)
             vm_gen(cmpi,5);
         else
-            yyerror("Incompatible types in arithmetic operation!");
+            yyerror("Incompatible types in comparison operation!");
     };
 
 add_expr: term 
@@ -283,6 +365,63 @@ term: factor
         else
             yyerror("Incompatible types in arithmetic operation!");
         $$ = MIN($1,$3);
+    }
+| factor BAND factor
+    {
+        if ($1 != 3 && $3 != 3)
+            vm_gen(bit, 0);
+        else
+            yyerror("Incompatible types in bit-wise operation!");
+        $$ = MIN($1,$3);
+    }
+| factor BOR factor
+    {
+        if ($1 != 3 && $3 != 3)
+            vm_gen(bit, 1);
+        else
+            yyerror("Incompatible types in bit-wise operation!");
+        $$ = MIN($1,$3);
+    }
+| BNOT factor
+    {
+        if ($2 != 3)
+            vm_gen(bit, 2);
+        else
+            yyerror("Incompatible types in bit-wise operation!");
+        $$ = $2;
+    }
+| factor BXOR factor
+    {
+        if ($1 != 3 && $3 != 3)
+            vm_gen(bit, 3);
+        else
+            yyerror("Incompatible types in bit-wise operation!");
+        $$ = MIN($1,$3);
+    }
+| factor SHIFTL factor
+    {
+        if ($1 != 3 && $3 != 3)
+            vm_gen(bit, 4);
+        else
+            yyerror("Incompatible types in bit-wise operation!");
+        $$ = MIN($1,$3);
+    }
+| factor SHIFTR factor
+    {
+        if ($1 != 3 && $3 != 3)
+            vm_gen(bit, 5);
+        else
+            yyerror("Incompatible types in bit-wise operation!");
+        $$ = MIN($1,$3);
+    }
+| ODD factor 
+    {
+        if ($2 != 3) {
+            vm_gen(lit, 1);
+            vm_gen(bit, 0);
+        } else
+            yyerror("Incompatible types in odd/even classification!");
+        $$ = $2;
     }; 
 
 factor: NUM 
@@ -366,6 +505,10 @@ ident: ID
                 yyerror("Symbol does not exist"); 
          };
 
+code_addr: 
+    {
+        $$ = code_cnt;
+    };
 ////////////////////////////////////////////////////////
 //程序部分
 %%

@@ -1,11 +1,18 @@
 main{
-    int a[3][5];
-    a[2][3] = 2;
-    a[1][4] = 5;
-    a[0][1] = a[2][3] * (a[1][4] + 3 * 4);
-    write 3 > 2;
-    write 3 == 2;
-    write 3 < 2;
-    write 3 !=2 ;
+    bool isprime[101];
+    int i;
+    int j;
+    isprime[1] = false;
+    for (i = 2;i <= 100; i = i + 1)
+        isprime[i] = true;
+    for (i = 2;i <= 100; i = i + 1) {
+        if (isprime[i])
+            for (j = 2 * i;j <= 100; j = j + i)
+                isprime[j] = false;
+    }
+    for (i = 1;i <= 100; i = i + 1)
+        if (isprime[i]) {
+            write i;
+            write ' ';
+        }
 }
-/*???*/
