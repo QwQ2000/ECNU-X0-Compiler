@@ -2,9 +2,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define I2F(x) (*((float*)&(x)))
-#define F2I(x) (*((int*)&(x)))
-
 char* mne_str[] = {"lod", "lit", "sto", "cal", "ini", 
     "jmp", "jpc", "wrt", "red", "arti", "artf", "log", 
     "bit", "cmpi", "cmpf", "cvt", "pop", "mov", "lodr", "stor"};
@@ -141,7 +138,7 @@ void vm_step(FILE* inf, FILE* outf) {
                     break;
                 
                 case 1:
-                    stack[top - 1] = stack[top] - stack[top - 1];
+                    stack[top - 1] = stack[top - 1] - stack[top];
                     break;
                 
                 case 2:
@@ -166,7 +163,7 @@ void vm_step(FILE* inf, FILE* outf) {
                     break;
                 
                 case 1:
-                    tmp = I2F(stack[top]) - I2F(stack[top - 1]);
+                    tmp = I2F(stack[top - 1]) - I2F(stack[top]);
                     break;
                 
                 case 2:

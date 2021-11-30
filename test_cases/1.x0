@@ -3,14 +3,14 @@ main{
     int i;
     int j;
     isprime[1] = false;
-    for (i = 2;i <= 100; i = i + 1)
+    for (i = 2;i <= 100; ++i)
         isprime[i] = true;
-    for (i = 2;i <= 100; i = i + 1) {
+    for (i = 2;i <= 100; ++i) {
         if (isprime[i])
             for (j = 2 * i;j <= 100; j = j + i)
                 isprime[j] = false;
     }
-    for (i = 1;i <= 100; i = i + 1)
+    for (i = 1;i <= 100; ++i)
         if (isprime[i]) {
             write i;
             write ' ';

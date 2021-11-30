@@ -58,6 +58,8 @@ int yywrap(void);
 ">>"		{return SHIFTR;}
 "odd"		{return ODD;}
 "for"		{return FORSYM;}
+"++"		{return INC;}
+"--"		{return DEC;}
 
 "true"  {yylval.lit_c = (struct lit_const*)malloc(sizeof(struct lit_const));
 	yylval.lit_c -> t = xbool;

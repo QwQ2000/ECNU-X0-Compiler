@@ -17,8 +17,10 @@ char fname[MAX_ID_LEN];
 int err;
 extern int line; 
 int proc_table_bot, addr, len_prod[MAX_ARR_DIM];
+float float_buf;
 
 void init();
+void gen_var_code(int tbl_idx);
 
 #define MIN(a,b) (((a)<(b))?(a):(b))
 
@@ -39,7 +41,7 @@ struct var_info* var_inf;
 
 %token MAINSYM, IFSYM, ELSESYM, WHILESYM, READSYM, WRITESYM, CONSTSYM
 %token LBRACE, RBRACE, LBRACKET, RBRACKET, SEMICOLON, LPAREN, RPAREN 
-%token DOSYM, REPEATSYM, UNTILSYM, FORSYM
+%token DOSYM, REPEATSYM, UNTILSYM, FORSYM, INC, DEC
 
 %left BECOMES, LSS, LEQ, GTR, GEQ, EQ, NEQ, PLUS, MINUS, TIMES, SLASH
 %left MOD, AND, OR, BAND, BOR, BXOR, SHIFTL, SHIFTR
@@ -434,11 +436,95 @@ factor: NUM
         $$ = table[$1].type;
         if (table[$1].is_const)
             vm_gen(lit,table[$1].const_val);
-        else if (table[$1].len[0] != -1) {
-            vm_gen(lodr, 0);
-            vm_gen(pop, 1);
-        } else
+        else gen_var_code($1);
+    }
+| INC var
+    {
+        $$ = table[$2].type;
+        if (table[$2].is_const)
+            yyerror("Using self-increment operation on constant values");
+        else
+            gen_var_code($2);
+        if (table[$2].type == 3) {
+            float_buf = 1;
+            vm_gen(lit, F2I(float_buf));
+            vm_gen(artf, 0);
+            vm_gen(sto, table[$2].addr);
+            vm_gen(lod, table[$2].addr);
+        } else {
+            vm_gen(lit, 1);
+            vm_gen(arti, 0);
+            vm_gen(sto, table[$2].addr);
+            vm_gen(lod, table[$2].addr);
+        }
+    }
+| DEC var
+    {
+        $$ = table[$2].type;
+        if (table[$2].is_const)
+            yyerror("Using self-decrement operation on constant values");
+        else
+            gen_var_code($2);
+        if (table[$2].type == 3) {
+            float_buf = 1;
+            vm_gen(lit, F2I(float_buf));
+            vm_gen(artf, 1);
+            vm_gen(sto, table[$2].addr);
+            vm_gen(lod, table[$2].addr);
+        } else {
+            vm_gen(lit, 1);
+            vm_gen(arti, 1);
+            vm_gen(sto, table[$2].addr);
+            vm_gen(lod, table[$2].addr);
+        }
+    }
+| var INC
+    {
+        $$ = table[$1].type;
+        if (table[$1].is_const)
+            yyerror("Using self-increment operation on constant values");
+        else
+            gen_var_code($1);
+        if (table[$1].type == 3) {
+            float_buf = 1;
+            vm_gen(lit, F2I(float_buf));
+            vm_gen(artf, 0);
+            vm_gen(sto, table[$1].addr);
             vm_gen(lod, table[$1].addr);
+            vm_gen(lit, F2I(float_buf));
+            vm_gen(artf, 1);
+        } else {
+            vm_gen(lit, 1);
+            vm_gen(arti, 0);
+            vm_gen(sto, table[$1].addr);
+            vm_gen(lod, table[$1].addr);
+            vm_gen(lit, 1);
+            vm_gen(arti, 1);
+        }
+    }
+| var DEC
+    {
+        $$ = table[$1].type;
+        if (table[$1].is_const)
+            yyerror("Using self-decrement operation on constant values");
+        else
+            gen_var_code($1);
+        if (table[$1].type == 3) {
+            float_buf = 1;
+            vm_gen(lit, F2I(float_buf));
+            vm_gen(artf, 1);
+            vm_gen(sto, table[$1].addr);
+            vm_gen(lod, table[$1].addr);
+            vm_gen(lit, F2I(float_buf));
+            vm_gen(artf, 0);
+        } else {
+            vm_gen(lit, 1);
+            vm_gen(arti, 1);
+            vm_gen(sto, table[$1].addr);
+            vm_gen(lod, table[$1].addr);
+            vm_gen(lit, 1);
+            vm_gen(arti, 0);
+        }
     }
 | LPAREN expr RPAREN 
     {
@@ -512,6 +598,14 @@ code_addr:
 ////////////////////////////////////////////////////////
 //程序部分
 %%
+void gen_var_code(int tbl_idx) {
+    if (table[tbl_idx].len[0] != -1) {
+        vm_gen(lodr, 0);
+        vm_gen(pop, 1);
+    } else
+        vm_gen(lod, table[tbl_idx].addr);
+}
+
 int yyerror(char *s) {
 	err = err + 1;
     printf("%s in line %d\n", s, line);

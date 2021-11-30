@@ -67,34 +67,36 @@ extern int yydebug;
     REPEATSYM = 273,
     UNTILSYM = 274,
     FORSYM = 275,
-    BECOMES = 276,
-    LSS = 277,
-    LEQ = 278,
-    GTR = 279,
-    GEQ = 280,
-    EQ = 281,
-    NEQ = 282,
-    PLUS = 283,
-    MINUS = 284,
-    TIMES = 285,
-    SLASH = 286,
-    MOD = 287,
-    AND = 288,
-    OR = 289,
-    BAND = 290,
-    BOR = 291,
-    BXOR = 292,
-    SHIFTL = 293,
-    SHIFTR = 294,
-    NOT = 295,
-    BNOT = 296,
-    ODD = 297,
-    INTSYM = 298,
-    CHARSYM = 299,
-    BOOLSYM = 300,
-    FLOATSYM = 301,
-    ID = 302,
-    NUM = 303
+    INC = 276,
+    DEC = 277,
+    BECOMES = 278,
+    LSS = 279,
+    LEQ = 280,
+    GTR = 281,
+    GEQ = 282,
+    EQ = 283,
+    NEQ = 284,
+    PLUS = 285,
+    MINUS = 286,
+    TIMES = 287,
+    SLASH = 288,
+    MOD = 289,
+    AND = 290,
+    OR = 291,
+    BAND = 292,
+    BOR = 293,
+    BXOR = 294,
+    SHIFTL = 295,
+    SHIFTR = 296,
+    NOT = 297,
+    BNOT = 298,
+    ODD = 299,
+    INTSYM = 300,
+    CHARSYM = 301,
+    BOOLSYM = 302,
+    FLOATSYM = 303,
+    ID = 304,
+    NUM = 305
   };
 #endif
 
@@ -102,7 +104,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 31 "x0.y"
+#line 33 "x0.y"
 
 char *ident;
 struct lit_const* lit_c;
@@ -111,7 +113,7 @@ int id_t;
 struct arr_dim* arr_dim;
 struct var_info* var_inf;
 
-#line 115 "x0.tab.h"
+#line 117 "x0.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

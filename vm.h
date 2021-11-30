@@ -8,6 +8,9 @@
 #define VM_STACK_MAX 50000 /* 虚拟机栈上限 */
 #define VM_MNE_N 20 /* 虚拟机助记符数量 */
 
+#define I2F(x) (*((float*)&(x)))
+#define F2I(x) (*((int*)&(x)))
+
 /* 虚拟机指令助记符： 指令集已经重新设计 */
 enum mne {
     lod, lit, sto, cal, ini, jmp, jpc, // opr指令被全面拆分
