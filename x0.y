@@ -623,7 +623,7 @@ int main(int argc,char **argv) {
     char* out_file_name = NULL;
 
     //yydebug = 1;
-
+    printf("The X0 Compiler\n");
     if (argc == 1) {
         printf("Usage:x0_compiler input_file [output_file]");
     }
@@ -648,15 +648,15 @@ int main(int argc,char **argv) {
 	
     if (err == 0) {
 		printf("\n===Parsing success!===\n");
-		fprintf(foutput, "\n===Parsing success!===\n");
+		//fprintf(foutput, "\n===Parsing success!===\n");
         table_print();
         vm_save_ins(foutput);
-        printf("\n===Start===\n");
-        vm_init();
-        vm_execute(stdin,stdout);
+        //printf("\n===Start===\n");
+        //vm_init();
+        //vm_execute(stdin,stdout);
 	} else {
 		printf("%d errors in x0 program\n", err);
-		fprintf(foutput, "%d errors in x0 program\n", err);
+		//fprintf(foutput, "%d errors in x0 program\n", err);
 	}
     
     fclose(foutput);

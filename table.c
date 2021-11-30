@@ -23,12 +23,11 @@ int table_find(char *id) {
 
 void table_print() {
 	printf("\n===Symbol Table===\n");
-	printf("NAME\tTYPE\tCONST\tLEN\t\tCONST_VAL\tADDR\n");
+	printf("NAME\tTYPE\tCONST\tADDR\tCVAL\tLEN\n");
 	for (int i = 0;i < tbl_tail;++i) {
-		printf("%s\t%d\t%d\t", table[i].name, table[i].type, table[i].is_const);
+		printf("%s\t%d\t%d\t%d\t%d\t", table[i].name, table[i].type, table[i].is_const, table[i].addr, table[i].const_val);
 		for (int j = 0;j < MAX_ARR_DIM;++j)
-			printf((j == MAX_ARR_DIM - 1) ? "%d\t" : "%d,",table[i].len[j]);
-		printf("%d\t\t%d\n", table[i].const_val, table[i].addr);
+			printf((j == MAX_ARR_DIM - 1) ? "%d\n" : "%d,",table[i].len[j]);
 	}
 }
 
