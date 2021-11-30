@@ -175,5 +175,12 @@ void MainWindow::handleActions(QAction *a) {
         compile();
     else if (cmd == "actionRun")
         runASM();
-
+    else if (cmd == "actionSaveVM") {
+        QString fileName = QFileDialog::getSaveFileName(this,tr("Save VM ASM Code"),".",tr("VM ASM File(*vmasm)"));
+        if (fileName.length() && code_cnt) {
+            std::FILE* f = std::fopen((fileName + ".vmasm").toStdString().c_str(),"w");
+            vm_save_ins(f);
+            std::fclose(f);
+        }
+    }
 }
