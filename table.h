@@ -33,5 +33,5 @@ void table_register(enum id_type t,int is_const); /* 在符号表中加入一个
 int table_find(char *id); /* 在符号表中查找标识符 */
 void table_print(); /* 打印符号表信息 */
 int table_arr_size(struct table_t t); /* 输出数组所占的空间，非数组为-1 */
-int table_arr_dim(struct table_t t); /* */
+int table_arr_dim(struct table_t t); /* 输出数组的维度数 */
 #endif

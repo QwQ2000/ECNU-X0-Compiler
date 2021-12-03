@@ -11,9 +11,10 @@
 #include "vm.h"
 #include "sdt_structs.h"
 
-FILE* fin;      /* 输入源文件 */
-FILE* foutput;  /* 输出出错示意（如有错） */
+FILE* fin;      
+FILE* foutput;  
 char fname[MAX_ID_LEN];
+
 int err;
 extern int line; 
 int proc_table_bot, addr, len_prod[MAX_ARR_DIM];
@@ -24,7 +25,7 @@ void gen_var_code(int tbl_idx);
 
 #define MIN(a,b) (((a)<(b))?(a):(b))
 
-#define YYDEBUG 1
+//#define YYDEBUG 1
 %}
 
 ////////////////////////////////////////////////////////
@@ -705,19 +706,17 @@ int main(int argc,char **argv) {
 	
     if (err == 0) {
 		printf("\n===Parsing success!===\n");
-		//fprintf(foutput, "\n===Parsing success!===\n");
         table_print();
         vm_save_ins(foutput);
-        //fclose(foutput);
+
+        // 不使用IDE单独运行命令行编译器
         //printf("\n===Start===\n");
         //vm_init();
         //vm_execute(stdin,stdout);
-	} else {
+	} else
 		printf("%d errors in x0 program\n", err);
-		//fprintf(foutput, "%d errors in x0 program\n", err);
-	}
     
-    //fclose(foutput);
+    fclose(foutput);
 	fclose(fin);
 	
     return 0;

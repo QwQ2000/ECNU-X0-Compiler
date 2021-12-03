@@ -43,12 +43,8 @@ void vm_save_ins(FILE* outf) {
 }
 
 void vm_execute(FILE* inf, FILE* outf) {
-    while (cur < code_cnt) {
+    while (cur < code_cnt)
         vm_step(inf, outf);
-        /*for (int i=0;i<top;++i)
-            printf("%d ",stack[i]);
-        printf("\n");*/
-    }
 }
 
 void vm_gen(enum mne m, int a) {
@@ -319,11 +315,3 @@ void vm_step(FILE* inf, FILE* outf) {
             stack[top++] = top - 1;
     }
 }
-
-/* int main() {
-    FILE* pcode=fopen("pcode.txt","r");
-    FILE* inf=fopen("input.txt","r");
-    vm_init();
-    vm_load_ins(pcode);
-    vm_execute(inf,stdout);
-}*/
