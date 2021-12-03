@@ -1,0 +1,13 @@
+main {
+    int a;
+    read a;
+    switch (a) {
+        case 1: 
+            write 1;
+        case 2:
+            write 2;
+        case 3:
+        write 3;
+        case 4: write 4;
+    }
+}

@@ -4,7 +4,8 @@
 
 char* mne_str[] = {"lod", "lit", "sto", "cal", "ini", 
     "jmp", "jpc", "wrt", "red", "arti", "artf", "log", 
-    "bit", "cmpi", "cmpf", "cvt", "pop", "mov", "lodr", "stor"};
+    "bit", "cmpi", "cmpf", "cvt", "pop", "mov", "lodr", 
+    "stor", "adr"};
 
 void vm_init() {
     cur = 0;
@@ -36,8 +37,9 @@ void vm_load_ins(FILE* inf) {
 
 void vm_save_ins(FILE* outf) {
     int i;
-    for (i = 0;i < code_cnt;++i)
+    for (i = 0;i < code_cnt;++i) {
         fprintf(outf,"%s %d\n",mne_str[vcode[i].m],vcode[i].a);  
+    }
 }
 
 void vm_execute(FILE* inf, FILE* outf) {
@@ -312,6 +314,9 @@ void vm_step(FILE* inf, FILE* outf) {
         case stor:
             stack[base + off_stk[os_top - 1]] = stack[--top];
             break;
+        
+        case adr:
+            stack[top++] = top - 1;
     }
 }
 

@@ -4,7 +4,8 @@
 
 char* mne_str[] = {"lod", "lit", "sto", "cal", "ini", 
     "jmp", "jpc", "wrt", "red", "arti", "artf", "log", 
-    "bit", "cmpi", "cmpf", "cvt", "pop", "mov", "lodr", "stor"};
+    "bit", "cmpi", "cmpf", "cvt", "pop", "mov", "lodr", 
+    "stor", "adr"};
 
 void vm_init() {
     cur = 0;
@@ -298,5 +299,8 @@ void vm_step(FILE* inf, char* outs) {
         case stor:
             stack[base + off_stk[os_top - 1]] = stack[--top];
             break;
+
+        case adr:
+            stack[top++] = top - 1;
     }
 }

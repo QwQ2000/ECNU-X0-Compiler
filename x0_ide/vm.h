@@ -12,7 +12,7 @@ extern "C" {
 
 #define VM_INST_MAX 5000 /* 虚拟机指令上限 */
 #define VM_STACK_MAX 50000 /* 虚拟机栈上限 */
-#define VM_MNE_N 20 /* 虚拟机助记符数量 */
+#define VM_MNE_N 21 /* 虚拟机助记符数量 */
 
 #define I2F(x) (*((float*)&(x)))
 #define F2I(x) (*((int*)&(x)))
@@ -28,7 +28,8 @@ enum mne {
     cvt, // 将int和float互相转换的指令
     pop, // 弹出栈/偏移量栈栈顶的指令，用于翻译赋值表达式和数组寻址
     mov, // 将栈顶元素移入偏移量栈
-    lodr, stor // 利用偏移量栈，用于进行数组寻址
+    lodr, stor, // 利用偏移量栈，用于进行数组寻址
+    adr // 将栈顶地址放入栈中，用于实现switch-case语句
 };
 extern char* mne_str[VM_MNE_N];
 

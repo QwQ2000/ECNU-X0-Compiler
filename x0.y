@@ -37,11 +37,13 @@ int number;
 int id_t;
 struct arr_dim* arr_dim;
 struct var_info* var_inf;
+struct case_list* clist;
 }
 
 %token MAINSYM, IFSYM, ELSESYM, WHILESYM, READSYM, WRITESYM, CONSTSYM
 %token LBRACE, RBRACE, LBRACKET, RBRACKET, SEMICOLON, LPAREN, RPAREN 
-%token DOSYM, REPEATSYM, UNTILSYM, FORSYM, INC, DEC
+%token DOSYM, REPEATSYM, UNTILSYM, FORSYM, INC, DEC, SWITCHSYM
+%token CASESYM, COLON
 
 %left BECOMES, LSS, LEQ, GTR, GEQ, EQ, NEQ, PLUS, MINUS, TIMES, SLASH
 %left MOD, AND, OR, BAND, BOR, BXOR, SHIFTL, SHIFTR
@@ -55,6 +57,7 @@ struct var_info* var_inf;
 %type <number> var, arr_offset, code_addr, else_stat
 %type <id_t> type, expr, simple_expr, add_expr, term, factor, logic_expr
 %type <arr_dim> dim_list
+%type <clist> case_list
 
 %start program
 
@@ -127,7 +130,59 @@ stat_list: stat_list stat | ;
 
 stat: if_stat | while_stat | read_stat 
 | write_stat | comp_stat | expr_stat
-| for_stat; 
+| for_stat | switch_stat {}; 
+
+switch_stat: SWITCHSYM LPAREN expr 
+                                { 
+                                    vm_gen(adr, 0);
+                                    vm_gen(lit, 1);
+                                    vm_gen(arti, 1);
+                                    vm_gen(mov, 0); // 将expr计算结果的地址存入偏移量栈，便于后续反复读取
+                                } 
+RPAREN  LBRACE case_list RBRACE 
+    { 
+        vm_gen(pop, 0); // 消耗掉expr的值
+        vm_gen(pop, 1); // 消耗掉偏移量栈中expr结果的地址 
+        
+        for (int i = 0;i < $7 -> len; ++i) // 检查expr和case中常数的类型是否匹配
+            if ($7 -> t[i] == 3 && $3 != 3 || $7 -> t[i] != 3 && $3 == 3)
+                yyerror("Incompatible value type in switch-case statement!");
+        for (int i = 0;i < $7 -> len - 1; ++i) // 回填jpc指令
+            vcode[$7 -> beg_pos[i] + 3].a = $7 -> beg_pos[i + 1];
+        vcode[$7 -> beg_pos[$7 -> len - 1] + 3].a = $7 -> end_pos; // 回填最后一个case的jpc指令
+    };
+
+case_list: CASESYM NUM COLON code_addr 
+                        {
+                            $<clist>$ = (struct case_list*)malloc(sizeof(struct case_list));
+                            $<clist>$ -> len = 1;
+                            $<clist>$ -> beg_pos[0] = $4;
+                            $<clist>$ -> t[0] = $2 -> t;
+                            vm_gen(lit, $2 -> val); // 将当前case的值放入栈顶
+                            vm_gen(lodr, 0); // 将switch小括号中的表达式值放入栈顶
+                            if ($2 -> t == 3)
+                                vm_gen(cmpf, 4);
+                            else
+                                vm_gen(cmpi, 4);
+                            vm_gen(jpc, -1); // 二者不相等则跳转，等待回填
+                        } stat code_addr
+                            {
+                                $$ = $<clist>5; 
+                                $$ -> end_pos = $7;
+                            }
+| case_list CASESYM NUM COLON code_addr 
+                                        {
+                                            $<clist>$ = $1;
+                                            $<clist>$ -> beg_pos[$<clist>$ -> len] = $5;
+                                            $<clist>$ -> t[$<clist>$ -> len++] = $3 -> t;
+                                            vm_gen(lit, $3 -> val); // 将当前case的值放入栈顶
+                                            vm_gen(lodr, 0); // 将switch小括号中的表达式值放入栈顶
+                                            if ($3 -> t == 3)
+                                                vm_gen(cmpf, 4);
+                                            else
+                                                vm_gen(cmpi, 4);
+                                            vm_gen(jpc, -1); // 二者不相等则跳转，等待回填
+                                        } stat code_addr { $$ = $<clist>6; $$ -> end_pos = $8;};
 
 if_stat: IFSYM LPAREN expr RPAREN code_addr   
                                     {
@@ -595,6 +650,7 @@ code_addr:
     {
         $$ = code_cnt;
     };
+
 ////////////////////////////////////////////////////////
 //程序部分
 %%
@@ -623,6 +679,7 @@ int main(int argc,char **argv) {
     char* out_file_name = NULL;
 
     //yydebug = 1;
+    
     printf("The X0 Compiler\n");
     if (argc == 1) {
         printf("Usage:x0_compiler input_file [output_file]");
@@ -651,6 +708,7 @@ int main(int argc,char **argv) {
 		//fprintf(foutput, "\n===Parsing success!===\n");
         table_print();
         vm_save_ins(foutput);
+        //fclose(foutput);
         //printf("\n===Start===\n");
         //vm_init();
         //vm_execute(stdin,stdout);
@@ -659,7 +717,7 @@ int main(int argc,char **argv) {
 		//fprintf(foutput, "%d errors in x0 program\n", err);
 	}
     
-    fclose(foutput);
+    //fclose(foutput);
 	fclose(fin);
 	
     return 0;

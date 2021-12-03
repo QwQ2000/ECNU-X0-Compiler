@@ -69,34 +69,37 @@ extern int yydebug;
     FORSYM = 275,
     INC = 276,
     DEC = 277,
-    BECOMES = 278,
-    LSS = 279,
-    LEQ = 280,
-    GTR = 281,
-    GEQ = 282,
-    EQ = 283,
-    NEQ = 284,
-    PLUS = 285,
-    MINUS = 286,
-    TIMES = 287,
-    SLASH = 288,
-    MOD = 289,
-    AND = 290,
-    OR = 291,
-    BAND = 292,
-    BOR = 293,
-    BXOR = 294,
-    SHIFTL = 295,
-    SHIFTR = 296,
-    NOT = 297,
-    BNOT = 298,
-    ODD = 299,
-    INTSYM = 300,
-    CHARSYM = 301,
-    BOOLSYM = 302,
-    FLOATSYM = 303,
-    ID = 304,
-    NUM = 305
+    SWITCHSYM = 278,
+    CASESYM = 279,
+    COLON = 280,
+    BECOMES = 281,
+    LSS = 282,
+    LEQ = 283,
+    GTR = 284,
+    GEQ = 285,
+    EQ = 286,
+    NEQ = 287,
+    PLUS = 288,
+    MINUS = 289,
+    TIMES = 290,
+    SLASH = 291,
+    MOD = 292,
+    AND = 293,
+    OR = 294,
+    BAND = 295,
+    BOR = 296,
+    BXOR = 297,
+    SHIFTL = 298,
+    SHIFTR = 299,
+    NOT = 300,
+    BNOT = 301,
+    ODD = 302,
+    INTSYM = 303,
+    CHARSYM = 304,
+    BOOLSYM = 305,
+    FLOATSYM = 306,
+    ID = 307,
+    NUM = 308
   };
 #endif
 
@@ -112,8 +115,9 @@ int number;
 int id_t;
 struct arr_dim* arr_dim;
 struct var_info* var_inf;
+struct case_list* clist;
 
-#line 117 "x0.tab.h"
+#line 121 "x0.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
