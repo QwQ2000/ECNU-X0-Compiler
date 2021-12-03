@@ -20,7 +20,7 @@ Run ```make``` at the root directory of this project to get the **x0_compiler**.
 
 Run **Qt Creator** and open the project file **x0_ide/x0_ide.pro**. Compile and run the project.
 
-![ui](imgs/ide_ui.png)
+![ui](ide_ui.png)
 
 (3) Configure the Path of the **x0_compiler**
 

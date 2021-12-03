@@ -138,12 +138,12 @@ switch_stat: SWITCHSYM LPAREN expr
                                     vm_gen(adr, 0);
                                     vm_gen(lit, 1);
                                     vm_gen(arti, 1);
-                                    vm_gen(mov, 0); // 将expr计算结果的地址存入偏移量栈，便于后续反复读取
+                                    vm_gen(mov, 0); // 将expr计算结果的地址存入辅助栈，便于后续反复读取
                                 } 
 RPAREN  LBRACE case_list RBRACE 
     { 
         vm_gen(pop, 0); // 消耗掉expr的值
-        vm_gen(pop, 1); // 消耗掉偏移量栈中expr结果的地址 
+        vm_gen(pop, 1); // 消耗掉辅助栈中expr结果的地址 
         
         for (int i = 0;i < $7 -> len; ++i) // 检查expr和case中常数的类型是否匹配
             if ($7 -> t[i] == 3 && $3 != 3 || $7 -> t[i] != 3 && $3 == 3)
@@ -611,7 +611,7 @@ var: ident
         {
             $$ = $1;
         }
-| ident arr_offset // 数组变量的语法制导翻译，解析数组元素的偏移量，并将计算好的偏移量移入偏移量寄存器
+| ident arr_offset // 数组变量的语法制导翻译，解析数组元素的偏移量，并将计算好的偏移量移入辅助栈
     {
         $$ = $1;
         if ($2 != table_arr_dim(table[$1]))

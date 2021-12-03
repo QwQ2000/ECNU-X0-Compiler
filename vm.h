@@ -37,7 +37,7 @@ int code_cnt; /* 虚拟机指令数量 */
 int cur; /* 当前指令下标 */
 
 int stack[VM_STACK_MAX]; /* 虚拟机的栈，每个数据均占4字节；由于不存在嵌套，每个过程的栈帧不包括静态链，仅包括动态链、返回地址 */
-int off_stk[VM_INST_MAX],os_top; /* 偏移量栈及其栈顶指针，供处理数组所用 */
+int off_stk[VM_INST_MAX],os_top; /* 辅助栈及其栈顶指针，供处理数组偏移量以及翻译switch-case语句所用 */
 int base, top; /* 当前过程基址，栈顶下标 */
 
 void vm_init(); /* 初始化虚拟机 */

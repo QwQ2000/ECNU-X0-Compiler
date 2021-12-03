@@ -288,14 +288,14 @@ void vm_step(FILE* inf, FILE* outf) {
             }
             break;
         
-        case pop: // 0 弹栈， 1 弹偏移量栈
+        case pop: // 0 弹栈， 1 辅助栈
             if (i.a == 0)
                 --top;
             else
                 --os_top;
             break;
         
-        case mov: // 0 栈->偏移量栈， 1 偏移量栈->栈
+        case mov: // 0 栈->辅助栈， 1 辅助栈->栈
             if (i.a == 0)
                 off_stk[os_top++] = stack[--top];
             else
