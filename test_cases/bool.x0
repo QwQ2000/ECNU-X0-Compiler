@@ -12,4 +12,6 @@ main {
     write not a;
     write ' ';
     write (not b) and a;
+    write ' ';
+    write b or 3.14;
 }

@@ -717,9 +717,9 @@ int main(int argc,char **argv) {
         vm_save_ins(foutput);
 
         // 不使用IDE单独运行命令行编译器
-        printf("\n===Start===\n");
+        /*printf("\n===Start===\n");
         vm_init();
-        vm_execute(stdin,stdout);
+        vm_execute(stdin,stdout);*/
 	} else
 		printf("%d errors in x0 program\n", err);
     

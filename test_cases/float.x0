@@ -1,17 +1,14 @@
 main {
-    bool a;
-    bool b;
+    int a;
+    float b;
+    const float c = 3.14;
 
-    a = true;
-    b = false;
+    a = 2;
+    b = 4.0;
 
-    write a or b;
+    write b / float(a);
     write ' ';
-    write a and b;
+    write int(c) + a;
     write ' ';
-    write not a;
-    write ' ';
-    write (not b) and a;
-    write ' ';
-    write b or 3.14;
+    write float(a) * c;
 }
