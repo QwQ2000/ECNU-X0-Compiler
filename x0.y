@@ -46,9 +46,12 @@ struct case_list* clist;
 %token DOSYM, REPEATSYM, UNTILSYM, FORSYM, INC, DEC, SWITCHSYM
 %token CASESYM, COLON
 
-%left BECOMES, LSS, LEQ, GTR, GEQ, EQ, NEQ, PLUS, MINUS, TIMES, SLASH
-%left MOD, AND, OR, BAND, BOR, BXOR, SHIFTL, SHIFTR
 %right NOT, BNOT, ODD
+%left TIMES, SLASH, MOD, BAND, BOR, BXOR, SHIFTL, SHIFTR
+%left PLUS, MINUS
+%left AND, OR
+%left LSS, LEQ, GTR, GEQ, EQ, NEQ
+%left BECOMES
 
 %token <id_t> INTSYM, CHARSYM, BOOLSYM, FLOATSYM
 %token <ident> ID
@@ -266,8 +269,9 @@ expr_stat: expr SEMICOLON
 expr: var BECOMES expr 
         {
             $$ = $3;
-            if (table[$1].is_const)
-                yyerror('Assigning value to a constant variable!');
+
+            if (table[$1].is_const) 
+                yyerror("Assigning value to a constant variable!");
             else if (table[$1].len[0] != -1) {
                 vm_gen(stor,0);
                 vm_gen(lodr,0);
@@ -589,22 +593,26 @@ factor: NUM
 | FLOATSYM LPAREN expr RPAREN
     {
         $$ = 3;
-        vm_gen(cvt,0);
+        if ($3 != 3)
+            vm_gen(cvt,0);
     }
 | INTSYM LPAREN expr RPAREN
     {
         $$ = 0;
-        vm_gen(cvt,1);
+        if ($3 == 3)
+            vm_gen(cvt,1);
     }
 | BOOLSYM LPAREN expr RPAREN
     {
         $$ = 2;
-        vm_gen(cvt,1);
+        if ($3 == 3)
+            vm_gen(cvt,1);
     }
 | CHARSYM LPAREN expr RPAREN
     {
         $$ = 1;
-        vm_gen(cvt,1);
+        if ($3 == 3)
+            vm_gen(cvt,1);
     };
 
 var: ident 
@@ -666,7 +674,6 @@ void gen_var_code(int tbl_idx) {
 int yyerror(char *s) {
 	err = err + 1;
     printf("%s in line %d\n", s, line);
-	fprintf(foutput, "%s in line %d\n", s, line);
 	return 0;
 }
 
@@ -710,9 +717,9 @@ int main(int argc,char **argv) {
         vm_save_ins(foutput);
 
         // 不使用IDE单独运行命令行编译器
-        //printf("\n===Start===\n");
-        //vm_init();
-        //vm_execute(stdin,stdout);
+        printf("\n===Start===\n");
+        vm_init();
+        vm_execute(stdin,stdout);
 	} else
 		printf("%d errors in x0 program\n", err);
     

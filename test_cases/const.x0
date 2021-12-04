@@ -1,0 +1,19 @@
+main {
+    const int a = 4;
+    const char b = 'c';
+    const bool c = true;
+    const float d = 3.14;
+
+    int v;
+    v = a - 2;
+
+    write float(a + v) + d;
+    write ' ';
+    write char(b + 3);
+    write ' ';
+    write c and (a - 4);
+    write ' ';
+    write int(d) + a;
+    /* a = 3; */
+    /* v = 2 + d; */
+}

@@ -1,0 +1,22 @@
+main {
+    const int max = 10;
+    int i;
+
+    i = 1;
+    do {
+        if (odd(i)) {
+            write i;
+            write ' ';
+        }
+        ++i;
+    } while (i <= max);
+
+    i = 1;
+    repeat {
+        if (not odd(i)) {
+            write i;
+            write ' ';
+        }
+        ++i;
+    } until (i > max);
+}

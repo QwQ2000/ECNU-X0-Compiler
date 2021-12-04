@@ -1,0 +1,23 @@
+main {
+    int a;
+    int b;
+    
+    a = 1;
+    b = 2;
+
+    write 7 % 4;
+    write ' ';
+    write a ^ b;
+    write ' ';
+    write odd(a);
+    write ' ';
+    write odd(b);
+    write ' ';
+    write ++a + b;
+    write ' ';
+    write a + b--;
+    write ' ';
+    write a;
+    write ' ';
+    write b;
+}

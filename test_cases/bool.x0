@@ -1,0 +1,15 @@
+main {
+    bool a;
+    bool b;
+
+    a = true;
+    b = false;
+
+    write a or b;
+    write ' ';
+    write a and b;
+    write ' ';
+    write not a;
+    write ' ';
+    write (not b) and a;
+}

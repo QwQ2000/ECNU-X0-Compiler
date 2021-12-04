@@ -7,7 +7,9 @@ main {
         case 2:
             write 2;
         case 3:
-        write 3;
-        case 4: write 4;
+            write 3;
+        case 4: 
+            write 4;
     }
+    write 'e';
 }
